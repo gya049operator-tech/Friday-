@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Fun Friday — Handi Biryani</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --bg: #1E140F;
+    --bg-raised: #2A1D16;
+    --line: #43312668;
+    --cream: #F4E7D3;
+    --cream-dim: #C9B79E;
+    --saffron: #D9A441;
+    --chili: #C0442E;
+    --chili-dark: #93321F;
+    --green: #6B8F52;
+    --radius: 10px;
+    --font-display: 'Zilla Slab', Georgia, serif;
+    --font-body: 'Work Sans', -apple-system, sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap');
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--cream);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:90px;
+  }
+  a{color:inherit;}
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:30;
+    background:linear-gradient(180deg,var(--bg) 80%, transparent);
+    padding:18px 18px 10px;
+  }
+  .brand-row{display:flex; align-items:flex-end; justify-content:space-between;}
+  .brand-eyebrow{
+    color:var(--saffron); font-size:12.5px; letter-spacing:.03em; margin:0 0 2px;
+  }
+  h1{
+    font-family:var(--font-display); font-weight:700; font-size:30px;
+    margin:0; line-height:1.05; color:var(--cream);
+  }
+  h1 span{color:var(--chili);}
+  .tagline{color:var(--cream-dim); font-size:13px; margin:4px 0 0;}
+  .call-btn{
+    display:flex; align-items:center; gap:6px;
+    border:1px solid var(--line); border-radius:100px;
+    padding:8px 12px; font-size:12.5px; color:var(--cream);
+    text-decoration:none; white-space:nowrap;
+  }
+
+  /* ---------- Category tabs ---------- */
+  nav.tabs{
+    display:flex; gap:8px; overflow-x:auto; padding:14px 18px 4px;
+    scrollbar-width:none;
+  }
+  nav.tabs::-webkit-scrollbar{display:none;}
+  nav.tabs button{
+    flex:0 0 auto;
+    background:var(--bg-raised); color:var(--cream-dim);
+    border:1px solid var(--line); border-radius:100px;
+    padding:7px 14px; font-family:var(--font-body); font-size:13px; font-weight:500;
+    cursor:pointer;
+  }
+  nav.tabs button.active{
+    background:var(--saffron); color:#241708; border-color:var(--saffron); font-weight:600;
+  }
+
+  /* ---------- Menu ---------- */
+  main{padding:6px 18px 20px;}
+  .category-block{margin-top:26px;}
+  .category-title{
+    font-family:var(--font-display); font-size:19px; font-weight:600;
+    color:var(--saffron); margin:0 0 2px; padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+  .item-row{
+    display:flex; justify-content:space-between; align-items:center;
+    gap:12px; padding:14px 0; border-bottom:1px solid var(--line);
+  }
+  .item-info{min-width:0;}
+  .item-name{font-size:15.5px; font-weight:500; color:var(--cream); margin:0;}
+  .item-desc{font-size:12.5px; color:var(--cream-dim); margin:3px 0 0; line-height:1.4;}
+  .item-price{font-size:13.5px; color:var(--saffron); margin:5px 0 0; font-weight:600;}
+  .item-action{flex:0 0 auto;}
+
+  .add-btn{
+    background:transparent; border:1.5px solid var(--saffron); color:var(--saffron);
+    border-radius:8px; padding:7px 16px; font-size:13px; font-weight:600;
+    cursor:pointer; font-family:var(--font-body);
+  }
+  .qty-stepper{
+    display:flex; align-items:center; gap:0;
+    border:1.5px solid var(--saffron); border-radius:8px; overflow:hidden;
+  }
+  .qty-stepper button{
+    background:var(--saffron); color:#241708; border:none;
+    width:30px; height:32px; font-size:16px; font-weight:700; cursor:pointer;
+  }
+  .qty-stepper span{
+    min-width:26px; text-align:center; font-size:14px; font-weight:600;
+  }
+
+  /* ---------- Floating cart bar ---------- */
+  .cart-bar{
+    position:fixed; left:16px; right:16px; bottom:16px; z-index:40;
+    background:var(--chili); border-radius:12px;
+    padding:14px 18px; display:none;
+    align-items:center; justify-content:space-between;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+    cursor:pointer; border:none; color:var(--cream); font-family:var(--font-body);
+    width:calc(100% - 32px);
+  }
+  .cart-bar.show{display:flex;}
+  .cart-bar .left{display:flex; flex-direction:column; align-items:flex-start;}
+  .cart-bar .count{font-size:12px; color:#F3D5C9;}
+  .cart-bar .total{font-size:17px; font-weight:700;}
+  .cart-bar .right{font-size:14px; font-weight:600; display:flex; align-items:center; gap:6px;}
+
+  /* ---------- Drawer / sheet ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(10,6,4,.6); z-index:50;
+    display:none;
+  }
+  .overlay.show{display:block;}
+  .sheet{
+    position:fixed; left:0; right:0; bottom:0; z-index:51;
+    background:var(--bg-raised); border-radius:18px 18px 0 0;
+    max-height:88vh; overflow-y:auto;
+    transform:translateY(100%); transition:transform .28s ease;
+    padding:20px 18px 26px;
+  }
+  .sheet.show{transform:translateY(0);}
+  .sheet-handle{width:38px; height:4px; background:var(--line); border-radius:4px; margin:0 auto 16px;}
+  .sheet-title{font-family:var(--font-display); font-size:20px; font-weight:700; margin:0 0 14px; display:flex; justify-content:space-between; align-items:center;}
+  .sheet-title button.close{background:none; border:none; color:var(--cream-dim); font-size:22px; cursor:pointer; line-height:1;}
+
+  .cart-line{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; border-bottom:1px solid var(--line); gap:10px;
+  }
+  .cart-line .name{font-size:14px; font-weight:500;}
+  .cart-line .price-each{font-size:12px; color:var(--cream-dim);}
+  .cart-line .line-total{font-size:14px; font-weight:600; color:var(--saffron); min-width:64px; text-align:right;}
+
+  .summary-row{display:flex; justify-content:space-between; font-size:14px; color:var(--cream-dim); padding:6px 0;}
+  .summary-row.grand{color:var(--cream); font-size:17px; font-weight:700; border-top:1px solid var(--line); margin-top:8px; padding-top:12px;}
+
+  .empty-cart{text-align:center; color:var(--cream-dim); padding:30px 0; font-size:14px;}
+
+  .primary-btn{
+    width:100%; background:var(--saffron); color:#241708; border:none;
+    border-radius:10px; padding:14px; font-size:15px; font-weight:700;
+    margin-top:16px; cursor:pointer; font-family:var(--font-body);
+  }
+  .primary-btn:disabled{opacity:.4; cursor:not-allowed;}
+  .secondary-btn{
+    width:100%; background:transparent; color:var(--cream); border:1.5px solid var(--line);
+    border-radius:10px; padding:12px; font-size:14px; font-weight:600;
+    margin-top:10px; cursor:pointer; font-family:var(--font-body);
+  }
+
+  /* ---------- Checkout screen ---------- */
+  .checkout-note{font-size:12.5px; color:var(--cream-dim); background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-top:12px; line-height:1.5;}
+  .qr-wrap{
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    background:var(--bg); border:1px solid var(--line); border-radius:12px;
+    padding:20px; margin-top:16px;
+  }
+  #qrcode{background:#fff; padding:10px; border-radius:8px;}
+  .qr-amount{font-family:var(--font-display); font-size:22px; font-weight:700; color:var(--saffron);}
+  .order-id{font-size:11.5px; color:var(--cream-dim); letter-spacing:.02em;}
+
+  .whatsapp-btn{
+    width:100%; background:var(--green); color:#fff; border:none;
+    border-radius:10px; padding:14px; font-size:15px; font-weight:700;
+    margin-top:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+    font-family:var(--font-body);
+  }
+
+  footer{
+    text-align:center; padding:24px 18px 10px; color:var(--cream-dim); font-size:11.5px; line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-row">
+    <div>
+      <p class="brand-eyebrow">NOT JUST FOOD, A MOMENT TO REMEMBER</p>
+      <h1>Fun Friday <span>Handi Biryani</span></h1>
+      <p class="tagline">Tap a dish to add it, then review &amp; pay from your cart.</p>
+    </div>
+    <a class="call-btn" href="tel:+919123166705">☎ Call</a>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<main id="menu"></main>
+
+<button class="cart-bar" id="cartBar" onclick="openCart()">
+  <div class="left">
+    <span class="count" id="cartCount">0 items</span>
+    <span class="total" id="cartTotalBar">₹0</span>
+  </div>
+  <div class="right">View cart →</div>
+</button>
+
+<div class="overlay" id="overlay" onclick="closeAllSheets()"></div>
+
+<!-- CART SHEET -->
+<div class="sheet" id="cartSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Your order <button class="close" onclick="closeAllSheets()">✕</button></div>
+  <div id="cartLines"></div>
+  <div id="cartSummary"></div>
+  <button class="primary-btn" id="checkoutBtn" onclick="openCheckout()">Proceed to pay</button>
+</div>
+
+<!-- CHECKOUT SHEET -->
+<div class="sheet" id="checkoutSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Confirm &amp; pay <button class="close" onclick="closeAllSheets()">✕</button></div>
+  <div id="checkoutLines"></div>
+  <div id="checkoutSummary"></div>
+
+  <div class="qr-wrap">
+    <div id="qrcode"></div>
+    <div class="qr-amount" id="qrAmount">₹0</div>
+    <div class="order-id" id="orderIdLabel"></div>
+  </div>
+  <div class="checkout-note">Scan the QR code above with any UPI app (GPay, PhonePe, Paytm) to pay this exact amount. After paying, tap the button below so we can confirm your order on WhatsApp.</div>
+
+  <button class="whatsapp-btn" onclick="sendToWhatsApp()">✓ I've paid — send order on WhatsApp</button>
+  <button class="secondary-btn" onclick="closeAllSheets()">Back to cart</button>
+</div>
+
+<footer>
+  Fun Friday · Handi Biryani<br>
+  For inquiries &amp; orders: 6201819687 · WhatsApp: 9123166705
+</footer>
+
+<script>
+/* ============================================================
+   OWNER SETTINGS — edit these two lines with your real details
+   ============================================================ */
+const UPI_ID = "9123166705@ybl";        // your UPI ID
+const UPI_PAYEE_NAME = "Fun Friday Handi Biryani";
+const WHATSAPP_NUMBER = "919123166705"; // country code + number, no + or spaces
+const PACKING_CHARGE = 21;              // flat packing charge if any biryani item is ordered
+
+/* ============================================================
+   MENU DATA — sourced from the restaurant's PDF menu
+   ============================================================ */
+const MENU = [
+  { category: "Signature Dish", items: [
+    { name: "Chicken Handi Biryani", price: 350, desc: "Slow-cooked chicken with aromatic basmati rice & rich spices", biryani:true },
+    { name: "Mutton Handi Biryani", price: 539, desc: "Tender mutton cooked to perfection in traditional style with rice", biryani:true },
+    { name: "Veg Handi Biryani", price: 350, desc: "Fresh vegetables blended with flavorful masala & rice", biryani:true },
+    { name: "Mushroom Handi Biryani", price: 350, desc: "Juicy mushrooms slow-cooked with aromatic spices, handi style", biryani:true },
+    { name: "Egg Handi Biryani", price: 310, desc: "Boiled eggs cooked with rich masala & layered with basmati rice", biryani:true },
+    { name: "Special Chicken Kabab", price: 296, desc: "6 pcs boneless chicken, richly marinated & tandoor-cooked" },
+    { name: "Chicken Fry", price: 269, desc: "Juicy chicken breast stuffed with melted cheese, coated & fried" },
+    { name: "Chicken Wings", price: 269, desc: "Juicy wings coated in a bold, signature spicy sauce" },
+  ]},
+  { category: "Roll", items: [
+    { name: "Special Chicken Roll", price: 203 },
+    { name: "Special Egg Roll", price: 176 },
+    { name: "Special Veg Roll", price: 162 },
+  ]},
+  { category: "Non-Veg Snacks", items: [
+    { name: "Chicken Finger", price: 242 },
+    { name: "Chilly Chicken Bone", price: 262 },
+    { name: "Chilly Chicken Boneless", price: 323 },
+    { name: "Chicken Lollipop", price: 262 },
+    { name: "Fire Chicken Chinese", price: 296 },
+    { name: "Chicken Manchurian", price: 296 },
+    { name: "Egg Pakora", price: 161 },
+  ]},
+  { category: "Veg Snacks", items: [
+    { name: "Veg Kurkura Kababs", price: 244 },
+    { name: "French Fries", price: 161 },
+    { name: "Onion Pakora", price: 161 },
+    { name: "Potato Pakora", price: 161 },
+    { name: "Paneer Chilly", price: 260 },
+    { name: "Potato Chilly", price: 196 },
+    { name: "Veg Manchurian", price: 188 },
+    { name: "Baby Corn Chilly", price: 269 },
+    { name: "Fire Baby Corn Chinese", price: 269 },
+    { name: "Mushroom Chilly", price: 284 },
+  ]},
+  { category: "Soup", items: [
+    { name: "Sweet Corn Soup", price: 149 },
+    { name: "Veg Manchow Soup", price: 149 },
+    { name: "Chicken Manchow Soup", price: 162 },
+    { name: "Chicken Egg Drop Soup", price: 162 },
+  ]},
+  { category: "Rice", items: [
+    { name: "Plain Rice", price: 149 },
+    { name: "Jeera Rice", price: 175 },
+    { name: "Veg Pulao", price: 210 },
+    { name: "Veg Fried Rice", price: 196 },
+    { name: "Egg Fried Rice", price: 229 },
+    { name: "Chicken Fried Rice", price: 264 },
+  ]},
+  { category: "Paratha", items: [
+    { name: "Plain Paratha", price: 34 },
+    { name: "Aloo Paratha", price: 68 },
+    { name: "Paneer Paratha", price: 81 },
+    { name: "Onion Paratha", price: 54 },
+  ]},
+  { category: "Roti", items: [
+    { name: "Tandoori Roti", price: 21 },
+    { name: "Butter Tandoori", price: 30 },
+    { name: "Tawa Roti", price: 14 },
+    { name: "Butter Roti", price: 21 },
+    { name: "Lachha Paratha", price: 54 },
+    { name: "Butter Naan", price: 61 },
+    { name: "Garlic Naan", price: 68 },
+  ]},
+  { category: "Non-Veg Curry", items: [
+    { name: "Chicken Curry", price: 264 },
+    { name: "Chicken Masala", price: 277 },
+    { name: "Chicken Do Pyaza", price: 293 },
+    { name: "Chicken Kadhai", price: 293 },
+    { name: "Chicken Butter Masala", price: 304 },
+    { name: "Chicken Handi", price: 372 },
+    { name: "Mutton Curry", price: 487 },
+    { name: "Mutton Masala", price: 539 },
+    { name: "Mutton Handi", price: 796 },
+    { name: "Egg Curry", price: 162 },
+  ]},
+  { category: "Veg Indian Curry", items: [
+    { name: "Shahi Paneer", price: 323 },
+    { name: "Dal Butter Fry", price: 149 },
+    { name: "Dal Fry", price: 135 },
+    { name: "Paneer Butter Masala", price: 310 },
+    { name: "Aloo Jeera", price: 134 },
+    { name: "Mix Veg", price: 223 },
+    { name: "Matar Paneer", price: 296 },
+    { name: "Mushroom Kadhai", price: 296 },
+  ]},
+  { category: "Tandoor", items: [
+    { name: "Special Chicken Kabab", price: 292 },
+    { name: "Chicken Leg Kabab", price: 458 },
+    { name: "Whole Roast Chicken", price: 796 },
+    { name: "Tandoori Chicken Full", price: 796 },
+    { name: "Tandoori Chicken Half", price: 450 },
+    { name: "Tandoori Chicken Kalimirch Full", price: 796 },
+    { name: "Tandoori Chicken Kalimirch Half", price: 458 },
+    { name: "Chicken Tikka", price: 323 },
+    { name: "Paneer Tikka", price: 323 },
+    { name: "Malai Tikka", price: 337 },
+    { name: "Aloo Tikka", price: 242 },
+    { name: "Chicken Sikh Kabab", price: 323 },
+    { name: "Chicken Lasooni Kabab", price: 292 },
+  ]},
+  { category: "Noodles", items: [
+    { name: "Veg Chowmein", price: 176 },
+    { name: "Egg Chowmein", price: 202 },
+    { name: "Chicken Chowmein", price: 237 },
+    { name: "Veg Thukpa", price: 149 },
+    { name: "Egg Thukpa", price: 169 },
+    { name: "Chicken Thukpa", price: 196 },
+  ]},
+  { category: "Dessert", items: [
+    { name: "Carrot Cake", price: 122 },
+    { name: "Chocolate Cake", price: 122 },
+  ]},
+  { category: "Veg Pizza", items: [
+    { name: "Veggie Pizza", price: 311 },
+    { name: "Hot & Fire Pizza", price: 284 },
+    { name: "Mushroom Rich Pizza", price: 324 },
+    { name: "Baby Corn Rich Pizza", price: 324 },
+    { name: "Onion Rich Pizza", price: 216 },
+    { name: "Tomato Basil Rich Pizza", price: 216 },
+    { name: "Tandoori Paneer Rich Pizza", price: 404 },
+  ]},
+  { category: "Non-Veg Pizza", items: [
+    { name: "Chicken Indiana", price: 310 },
+    { name: "Chicken Hot Chinese", price: 283 },
+    { name: "Chicken Mexican", price: 296 },
+  ]},
+  { category: "Beverage", items: [
+    { name: "Masala Chhanch", price: 80 },
+    { name: "Lassi", price: 107 },
+    { name: "Mint Mojito", price: 134 },
+    { name: "Watermelon Mojito", price: 162 },
+    { name: "Masala Colddrink", price: 54 },
+    { name: "Lemon Soda", price: 107 },
+    { name: "Lemon Water", price: 41 },
+    { name: "Cold Drink", price: 27 },
+    { name: "Ginger & Honey", price: 102 },
+    { name: "Milk Tea", price: 54 },
+    { name: "Lemon Tea", price: 34 },
+    { name: "Black Tea", price: 34 },
+    { name: "Mineral Water", price: 27 },
+    { name: "Espresso Coffee", price: 161 },
+  ]},
+  { category: "Sides", items: [
+    { name: "Green Salad", price: 107 },
+    { name: "Extra Raita", price: 14 },
+    { name: "Extra Potato", price: 14 },
+    { name: "Boiled Egg", price: 21 },
+  ]},
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const cart = {}; // key: itemId -> {item, qty}
+let qrObj = null;
+let currentOrderId = null;
+
+function itemId(catIdx, itemIdx){ return catIdx + "-" + itemIdx; }
+
+/* ============================================================
+   RENDER MENU + TABS
+   ============================================================ */
+const tabsEl = document.getElementById("tabs");
+const menuEl = document.getElementById("menu");
+
+MENU.forEach((cat, ci) => {
+  const tabBtn = document.createElement("button");
+  tabBtn.textContent = cat.category;
+  tabBtn.onclick = () => {
+    document.getElementById("cat-" + ci).scrollIntoView({behavior:"smooth", block:"start"});
+  };
+  tabsEl.appendChild(tabBtn);
+
+  const block = document.createElement("div");
+  block.className = "category-block";
+  block.id = "cat-" + ci;
+  block.innerHTML = `<h2 class="category-title">${cat.category}</h2>`;
+
+  cat.items.forEach((item, ii) => {
+    const id = itemId(ci, ii);
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.innerHTML = `
+      <div class="item-info">
+        <p class="item-name">${item.name}</p>
+        ${item.desc ? `<p class="item-desc">${item.desc}</p>` : ""}
+        <p class="item-price">₹${item.price}</p>
+      </div>
+      <div class="item-action" id="action-${id}"></div>
+    `;
+    block.appendChild(row);
+  });
+
+  menuEl.appendChild(block);
+
+  cat.items.forEach((item, ii) => {
+    renderAction(itemId(ci, ii), ci, ii, item);
+  });
+});
+
+function renderAction(id, ci, ii, item){
+  const el = document.getElementById("action-" + id);
+  const entry = cart[id];
+  if (!entry || entry.qty === 0){
+    el.innerHTML = `<button class="add-btn" onclick="addItem('${id}',${ci},${ii})">Add</button>`;
+  } else {
+    el.innerHTML = `
+      <div class="qty-stepper">
+        <button onclick="decItem('${id}',${ci},${ii})">−</button>
+        <span>${entry.qty}</span>
+        <button onclick="addItem('${id}',${ci},${ii})">+</button>
+      </div>`;
+  }
+}
+
+function addItem(id, ci, ii){
+  const item = MENU[ci].items[ii];
+  if (!cart[id]) cart[id] = { item, qty: 0 };
+  cart[id].qty++;
+  renderAction(id, ci, ii, item);
+  refreshCartBar();
+}
+function decItem(id, ci, ii){
+  if (!cart[id]) return;
+  cart[id].qty--;
+  if (cart[id].qty <= 0) delete cart[id];
+  renderAction(id, ci, ii, MENU[ci].items[ii]);
+  refreshCartBar();
+}
+
+/* ============================================================
+   CART TOTALS
+   ============================================================ */
+function calcTotals(){
+  let subtotal = 0, count = 0, hasBiryani = false;
+  Object.values(cart).forEach(({item, qty}) => {
+    subtotal += item.price * qty;
+    count += qty;
+    if (item.biryani) hasBiryani = true;
+  });
+  const packing = hasBiryani ? PACKING_CHARGE : 0;
+  const grandTotal = subtotal + packing;
+  return { subtotal, count, packing, grandTotal };
+}
+
+function refreshCartBar(){
+  const { subtotal, count, grandTotal } = calcTotals();
+  const bar = document.getElementById("cartBar");
+  if (count > 0){
+    bar.classList.add("show");
+    document.getElementById("cartCount").textContent = count + (count === 1 ? " item" : " items");
+    document.getElementById("cartTotalBar").textContent = "₹" + grandTotal;
+  } else {
+    bar.classList.remove("show");
+  }
+}
+
+/* ============================================================
+   CART SHEET
+   ============================================================ */
+const overlay = document.getElementById("overlay");
+const cartSheet = document.getElementById("cartSheet");
+const checkoutSheet = document.getElementById("checkoutSheet");
+
+function openCart(){
+  renderCartSheet();
+  overlay.classList.add("show");
+  cartSheet.classList.add("show");
+  checkoutSheet.classList.remove("show");
+}
+function closeAllSheets(){
+  overlay.classList.remove("show");
+  cartSheet.classList.remove("show");
+  checkoutSheet.classList.remove("show");
+}
+
+function renderCartSheet(){
+  const linesEl = document.getElementById("cartLines");
+  const summaryEl = document.getElementById("cartSummary");
+  const entries = Object.entries(cart);
+
+  if (entries.length === 0){
+    linesEl.innerHTML = `<div class="empty-cart">Your cart is empty. Add a few dishes to get started.</div>`;
+    summaryEl.innerHTML = "";
+    document.getElementById("checkoutBtn").disabled = true;
+    return;
+  }
+  document.getElementById("checkoutBtn").disabled = false;
+
+  linesEl.innerHTML = entries.map(([id, {item, qty}]) => `
+    <div class="cart-line">
+      <div>
+        <div class="name">${item.name}</div>
+        <div class="price-each">₹${item.price} × ${qty}</div>
+      </div>
+      <div class="line-total">₹${item.price * qty}</div>
+    </div>
+  `).join("");
+
+  const { subtotal, packing, grandTotal } = calcTotals();
+  summaryEl.innerHTML = `
+    <div class="summary-row"><span>Subtotal</span><span>₹${subtotal}</span></div>
+    ${packing > 0 ? `<div class="summary-row"><span>Packing charge (biryani)</span><span>₹${packing}</span></div>` : ""}
+    <div class="summary-row grand"><span>Total to pay</span><span>₹${grandTotal}</span></div>
+  `;
+}
+
+/* ============================================================
+   CHECKOUT SHEET + QR
+   ============================================================ */
+function openCheckout(){
+  if (Object.keys(cart).length === 0) return;
+  currentOrderId = "FF" + Date.now().toString().slice(-8);
+
+  const linesEl = document.getElementById("checkoutLines");
+  const summaryEl = document.getElementById("checkoutSummary");
+  const entries = Object.entries(cart);
+
+  linesEl.innerHTML = entries.map(([id, {item, qty}]) => `
+    <div class="cart-line">
+      <div><div class="name">${item.name}</div><div class="price-each">₹${item.price} × ${qty}</div></div>
+      <div class="line-total">₹${item.price * qty}</div>
+    </div>
+  `).join("");
+
+  const { subtotal, packing, grandTotal } = calcTotals();
+  summaryEl.innerHTML = `
+    <div class="summary-row"><span>Subtotal</span><span>₹${subtotal}</span></div>
+    ${packing > 0 ? `<div class="summary-row"><span>Packing charge</span><span>₹${packing}</span></div>` : ""}
+    <div class="summary-row grand"><span>Total to pay</span><span>₹${grandTotal}</span></div>
+  `;
+
+  document.getElementById("qrAmount").textContent = "₹" + grandTotal;
+  document.getElementById("orderIdLabel").textContent = "Order ID: " + currentOrderId;
+
+  const qrContainer = document.getElementById("qrcode");
+  qrContainer.innerHTML = "";
+  const upiUrl = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${grandTotal}&cu=INR&tn=${encodeURIComponent("Order " + currentOrderId)}`;
+  qrObj = new QRCode(qrContainer, {
+    text: upiUrl,
+    width: 190,
+    height: 190,
+    colorDark: "#1E140F",
+    colorLight: "#ffffff",
+  });
+
+  cartSheet.classList.remove("show");
+  checkoutSheet.classList.add("show");
+  overlay.classList.add("show");
+}
+
+/* ============================================================
+   SEND ORDER TO WHATSAPP
+   ============================================================ */
+function sendToWhatsApp(){
+  const { subtotal, packing, grandTotal } = calcTotals();
+  const entries = Object.entries(cart);
+  let msg = `New order — ${currentOrderId}\n\n`;
+  entries.forEach(([id, {item, qty}]) => {
+    msg += `${item.name} x${qty} — ₹${item.price * qty}\n`;
+  });
+  if (packing > 0) msg += `Packing charge — ₹${packing}\n`;
+  msg += `\nTotal: ₹${grandTotal}\nPayment: paid via UPI QR\n\nPlease confirm my order. Thank you!`;
+
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank");
+}
+
+refreshCartBar();
+</script>
+</body>
+</html>
